@@ -38,6 +38,7 @@ class UserAuthentication:
         return password == user.password
 
     def login_user(self, email: str, password: str) -> dict:
+        print(email, password)
         user = self.get_user(email)
         if user == None:
             return {

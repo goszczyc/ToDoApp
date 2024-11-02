@@ -52,6 +52,11 @@ class UserAuthentication:
                 "message": "Wrong password.",
                 "http-code": 401,
             }
-            
-        session['user'] = user.user_id
-        return {"status": "success", "message": "Login succesfull", "http-code": 200}
+
+        session["user"] = user.user_id
+        return {
+            "status": "success",
+            "message": "Login succesfull",
+            "user": user.user_id,
+            "http-code": 200,
+        }

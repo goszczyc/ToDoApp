@@ -1,5 +1,7 @@
 import { FormEvent, FormEventHandler, useState } from "react";
 
+// TODO if response ok -> save user id, and secret key to session storage
+
 function Login() {
     const [userInput, setUserInput] = useState({
         email: "",
@@ -9,8 +11,6 @@ function Login() {
         event.preventDefault();
         const form = event.currentTarget as HTMLFormElement;
         const formData = new FormData(form);
-        const email = formData.get("email");
-        const password = formData.get("password");
 
         const result = await fetch("http://127.0.0.1:5000/login", {
             method: "POST",
@@ -19,6 +19,12 @@ function Login() {
 
         if (!result.ok) {
             alert("CIPA");
+        }
+
+        const data = await result.json();
+
+        if(data.user) {
+            sessionStorage.setItem("user", data.user);
         }
     }
 

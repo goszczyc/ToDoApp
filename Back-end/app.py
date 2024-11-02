@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request, session
 from db_connection.db_connection import ConnectToDb
 from users.users import UserAuthentication
 import mariadb
-from flask import Flask
 from flask_cors import CORS, cross_origin
 
 

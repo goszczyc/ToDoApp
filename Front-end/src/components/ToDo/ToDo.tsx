@@ -10,9 +10,9 @@ function ToDo({ title, status, onRemove }: ToDoProps) {
 
     return (
         <li
-            className="border border-[#06a19d] rounded-lg px-6 py-7 flex items-center gap-6 w-fit shadow-[2px_2px_7px_0_rgba(6,161,157,0.2)]"
+            className="border border-[#06a19d] rounded-lg px-6 py-7 flex items-center gap-6 shadow-[2px_2px_7px_0_rgba(6,161,157,0.2)]"
         >
-            <p className="font-bold">{title}</p>
+            <p className="font-bold flex-grow">{title}</p>
             <div className="relative">
                 <select
                     name="status"

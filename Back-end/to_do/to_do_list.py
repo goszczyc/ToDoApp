@@ -1,8 +1,6 @@
 import mariadb
 from db_connection.db_connection import ConnectToDb
 
-# from .to_do import ToDo
-
 
 class ToDoList:
 
@@ -20,7 +18,7 @@ class ToDoList:
         """
         try:
             cursor = self.conn.cursor(dictionary=True)
-            cursor.execute("SELECT * FROM `to-dos` WHERE user_id=%s", (self.user_id, ))
+            cursor.execute("SELECT * FROM `to-dos` WHERE user_id=%s", (self.user_id,))
             data = cursor.fetchall()
             if data is None:
                 self.response["status"] = "error"
@@ -46,3 +44,27 @@ class ToDoList:
         finally:
             cursor.close()
             return self.response
+
+    def delete_to_do(self, id: int) -> dict:
+        """
+        Removes to-do with provided ID from database
+        """
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute("DELETE FROM `to-dos` WHERE id=%s", (id,))
+            self.conn.commit()
+            # Check if anything got deleted
+            if cursor.rowcount == 0:
+                raise mariadb.Error("No rows affected")
+            self.response["status"] = "success"
+            self.response["message"] = "Item removed successfully"
+            self.response["http-code"] = 200
+        except mariadb.Error as e:
+            print(e)
+            self.response["status"] = "error"
+            self.response["message"] = "Error removing item"
+            self.response["http-code"] = 404
+        finally:
+            cursor.close()
+            return self.response, self.response["http-code"]
+

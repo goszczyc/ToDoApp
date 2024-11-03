@@ -1,5 +1,7 @@
 import { SERVER_ADD } from "../../config";
 import { useEffect, useState } from "react";
+import NavBar from "../Navigation/NavBar";
+import ToDo from "./ToDo";
 
 interface ToDo {
     title: string;
@@ -23,7 +25,7 @@ function ToDoList() {
                 console.error(json.message);
             }
 
-            setToDoList(json.data['to-dos']);
+            setToDoList(json.data["to-dos"]);
         };
 
         fetchData().catch((e) => {
@@ -33,11 +35,17 @@ function ToDoList() {
         return () => {};
     }, []);
 
+    function removeToDo(index: number) {
+        // TODO: Add request to server to remove todo from db if it was removed successfully then remove from todo list
+        setToDoList(toDoList.filter((_, i) => i !== index));
+    }
+
     return (
         <div className="container">
-            <ul className="flex flex-col">
+            <NavBar />
+            <ul className="flex flex-col py-6 items-center">
                 {toDoList.map((toDo, index) => (
-                    <li key={index}>{toDo.title}</li>
+                    <ToDo key={index} title={toDo.title} onRemove={() => removeToDo(index)} status="to-do" />
                 ))}
             </ul>
         </div>

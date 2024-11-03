@@ -17,15 +17,9 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     return (
         <>
             <RouterProvider router={router} />
-            {/* <Routes>
-                <Route index element={<Login />} />
-                <Route path="login" element={<Login />} />
-                <Route path="to-do-list" element={<ToDoList />} />
-            </Routes> */}
         </>
     );
 }

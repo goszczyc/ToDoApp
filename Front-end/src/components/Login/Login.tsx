@@ -12,7 +12,7 @@ function Login() {
         const form = event.currentTarget as HTMLFormElement;
         const formData = new FormData(form);
 
-        const result = await fetch("http://127.0.0.1:5000/login", {
+        const result = await fetch("http://127.0.0.1:5000/api/users/login", {
             method: "POST",
             body: formData,
         });

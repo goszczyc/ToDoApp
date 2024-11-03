@@ -1,13 +1,7 @@
 from flask import Flask, jsonify, session
-from db_connection.db_connection import ConnectToDb
 import mariadb
-
-
-class User:
-    def __init__(self, user_id: int = 0, email: str = "", password: str = ""):
-        self.user_id = user_id
-        self.email = email
-        self.password = password
+from db_connection.db_connection import ConnectToDb
+from .user import User
 
 
 class UserAuthentication:
@@ -43,7 +37,7 @@ class UserAuthentication:
         if user == None:
             return {
                 "status": "error",
-                "message": "User with privided email does not exist :(",
+                "message": "User with provided email does not exist :(",
                 "http-code": 404,
             }
         if not self.verify_password(user, password):

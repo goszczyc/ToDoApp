@@ -1,8 +1,5 @@
 import { useState } from "react";
-import {
-    createBrowserRouter,
-    RouterProvider,
-} from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./components/Login/Login";
 import ToDoList from "./components/ToDo/ToDoList";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";

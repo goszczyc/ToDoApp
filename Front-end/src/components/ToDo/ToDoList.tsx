@@ -1,16 +1,21 @@
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import apiRequest from "../../misc/apiRequest";
 import NavBar from "../Navigation/NavBar";
-import ToDo from "./ToDo";
+import ToDoItem from "./ToDoItem";
+import AddToDoButton from "./AddToDoButton";
+import ToDoAddForm from "./ToDoAddForm";
 
 interface ToDo {
     title: string;
     id: number;
+    status: string;
 }
 
 function ToDoList() {
     const [toDoList, setToDoList] = useState<Array<ToDo>>([]);
+    const [isModalShown, setIsModalShown] = useState<boolean>(false);
 
+    // Get to-dos
     useEffect(() => {
         const fetchData = async () => {
             const response = await apiRequest("api/to-dos/get");
@@ -30,9 +35,11 @@ function ToDoList() {
         return () => {};
     }, []);
 
+
+    /**
+     * Succesfull request removes to-do with given id from database
+     */
     async function removeToDo(index: number, id: number) {
-        // TODO: Add request to server to remove todo from db if it was removed successfully then remove from todo list
-        console.log("ID:" + id)
         const data = new FormData();
         data.append("id", id.toString());
         const response = await apiRequest("api/to-dos/delete", {
@@ -45,16 +52,49 @@ function ToDoList() {
         setToDoList(toDoList.filter((_, i) => i !== index));
     }
 
+    /**
+     * Succesfull request adds new to-do in data base and refreshes to-dos list
+     */
+    async function addToDoHandle(formEvent: FormEvent) {
+        formEvent.preventDefault();
+        const form = formEvent.currentTarget as HTMLFormElement;
+        const data = new FormData(form);
+
+        const response = await apiRequest("api/to-dos/add", {
+            method: "POST",
+            body: data,
+        });
+
+        if (!response.ok) return alert("Something is no yes :(");
+
+        const res = await response.json();
+
+        setToDoList((prev) => [res, ...prev]);
+    }
+
+    function handleModalToggle() {
+        setIsModalShown((prev) => !prev);
+    }
+
     return (
         <div className="container">
             <NavBar />
+            <div className="grid place-items-center py-3 relative">
+                <AddToDoButton onClick={handleModalToggle} />
+                {isModalShown && (
+                    <ToDoAddForm
+                        addToDoHandle={addToDoHandle}
+                        closeModal={handleModalToggle}
+                    />
+                )}
+            </div>
             <ul className="container flex flex-col py-6 max-w-[480px] gap-6">
                 {toDoList.map((toDo, index) => (
-                    <ToDo
+                    <ToDoItem
                         key={index}
                         title={toDo.title}
                         onRemove={() => removeToDo(index, toDo.id)}
-                        status="to-do"
+                        status={toDo.status}
                     />
                 ))}
             </ul>

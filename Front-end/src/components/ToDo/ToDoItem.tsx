@@ -6,7 +6,7 @@ type ToDoProps = {
     onRemove: (event: React.SyntheticEvent) => void;
 };
 
-function ToDo({ title, status, onRemove }: ToDoProps) {
+function ToDoItem({ title, status, onRemove }: ToDoProps) {
 
     return (
         <li
@@ -37,4 +37,4 @@ function ToDo({ title, status, onRemove }: ToDoProps) {
     );
 }
 
-export default ToDo;
+export default ToDoItem;

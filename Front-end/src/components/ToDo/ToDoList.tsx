@@ -35,7 +35,6 @@ function ToDoList() {
         return () => {};
     }, []);
 
-
     /**
      * Succesfull request removes to-do with given id from database
      */
@@ -49,7 +48,7 @@ function ToDoList() {
 
         if (!response.ok) return alert("Error removing to do");
 
-        setToDoList(toDoList.filter((toDo) => toDo.id !== id));
+        setToDoList((prev) => prev.filter((toDO) => toDO.id !== id));
     }
 
     /**
@@ -70,7 +69,7 @@ function ToDoList() {
         const res = await response.json();
 
         setToDoList((prev) => [res.data, ...prev]);
-        handleModalToggle()
+        handleModalToggle();
     }
 
     function handleModalToggle() {

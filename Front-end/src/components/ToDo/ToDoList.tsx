@@ -39,7 +39,7 @@ function ToDoList() {
     /**
      * Succesfull request removes to-do with given id from database
      */
-    async function removeToDo(index: number, id: number) {
+    async function removeToDo(id: number) {
         const data = new FormData();
         data.append("id", id.toString());
         const response = await apiRequest("api/to-dos/delete", {
@@ -49,7 +49,7 @@ function ToDoList() {
 
         if (!response.ok) return alert("Error removing to do");
 
-        setToDoList(toDoList.filter((_, i) => i !== index));
+        setToDoList(toDoList.filter((toDo) => toDo.id !== id));
     }
 
     /**
@@ -69,7 +69,8 @@ function ToDoList() {
 
         const res = await response.json();
 
-        setToDoList((prev) => [res, ...prev]);
+        setToDoList((prev) => [res.data, ...prev]);
+        handleModalToggle()
     }
 
     function handleModalToggle() {
@@ -89,11 +90,11 @@ function ToDoList() {
                 )}
             </div>
             <ul className="container flex flex-col py-6 max-w-[480px] gap-6">
-                {toDoList.map((toDo, index) => (
+                {toDoList.map((toDo) => (
                     <ToDoItem
-                        key={index}
+                        key={toDo.id}
                         title={toDo.title}
-                        onRemove={() => removeToDo(index, toDo.id)}
+                        onRemove={() => removeToDo(toDo.id)}
                         status={toDo.status}
                     />
                 ))}

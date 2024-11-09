@@ -19,10 +19,10 @@ function ToDoItem({ title, status, onRemove }: ToDoProps) {
                     className="appearance-none rounded-md bg-[#add9d8] ps-5 pe-10 py-2"
                     defaultValue={status}
                 >
-                    <option value="to-do">
+                    <option value="To do">
                         To do
                     </option>
-                    <option value="done">
+                    <option value="Done">
                         Done
                     </option>
                 </select>

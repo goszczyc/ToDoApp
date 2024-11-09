@@ -29,7 +29,7 @@ def login():
     email = request.form.get("email")
     password = request.form.get("password")
     result = user_authentication.login_user(email, password)
-    return result, result["http-code"]
+    return result.get_response()
 
 
 @users_bp.route("/check_session")

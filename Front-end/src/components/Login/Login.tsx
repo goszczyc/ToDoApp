@@ -1,18 +1,17 @@
-import { FormEvent, FormEventHandler, useState } from "react";
+import { FormEvent } from "react";
+import apiRequest from "../../misc/apiRequest";
+import { useNavigate } from "react-router-dom";
 
 // TODO if response ok -> save user id, and secret key to session storage
 
 function Login() {
-    const [userInput, setUserInput] = useState({
-        email: "",
-        password: "",
-    });
+    const navigate = useNavigate();
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
         const form = event.currentTarget as HTMLFormElement;
         const formData = new FormData(form);
 
-        const result = await fetch("http://127.0.0.1:5000/login", {
+        const result = await apiRequest("api/users/login", {
             method: "POST",
             body: formData,
         });
@@ -23,8 +22,9 @@ function Login() {
 
         const data = await result.json();
 
-        if(data.user) {
-            sessionStorage.setItem("user", data.user);
+        if (data.data.user) {
+            sessionStorage.setItem("user", data.data.user);
+            navigate("/");
         }
     }
 

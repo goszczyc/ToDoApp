@@ -1,13 +1,8 @@
 from flask import Flask, jsonify, session
-from db_connection.db_connection import ConnectToDb
 import mariadb
-
-
-class User:
-    def __init__(self, user_id: int = 0, email: str = "", password: str = ""):
-        self.user_id = user_id
-        self.email = email
-        self.password = password
+from db_connection.db_connection import ConnectToDb
+from .user import User
+from util.json_response import JsonResponse
 
 
 class UserAuthentication:
@@ -37,26 +32,14 @@ class UserAuthentication:
     def verify_password(self, user: User, password: str) -> bool:
         return password == user.password
 
-    def login_user(self, email: str, password: str) -> dict:
-        print(email, password)
+    def login_user(self, email: str, password: str) -> JsonResponse:
+
         user = self.get_user(email)
         if user == None:
-            return {
-                "status": "error",
-                "message": "User with privided email does not exist :(",
-                "http-code": 404,
-            }
+            return JsonResponse(404, "User with provided email does not exist :(")
         if not self.verify_password(user, password):
-            return {
-                "status": "error",
-                "message": "Wrong password.",
-                "http-code": 401,
-            }
+            return JsonResponse(401, "Wrong password")
 
+        print(user.email, user.password)
         session["user"] = user.user_id
-        return {
-            "status": "success",
-            "message": "Login succesfull",
-            "user": user.user_id,
-            "http-code": 200,
-        }
+        return JsonResponse(200, "Login successfull", {"user": user.user_id})

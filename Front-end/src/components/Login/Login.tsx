@@ -22,8 +22,8 @@ function Login() {
 
         const data = await result.json();
 
-        if (data.user) {
-            sessionStorage.setItem("user", data.user);
+        if (data.data.user) {
+            sessionStorage.setItem("user", data.data.user);
             navigate("/");
         }
     }

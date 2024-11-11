@@ -19,7 +19,10 @@ class ToDoList:
 
         try:
             cursor = self.conn.cursor(dictionary=True)
-            cursor.execute("SELECT * FROM `to-dos` WHERE user_id=%s ORDER BY id DESC", (self.user_id,))
+            cursor.execute(
+                "SELECT * FROM `to-dos` WHERE user_id=%s ORDER BY id DESC",
+                (self.user_id,),
+            )
             data = cursor.fetchall()
             if data is None:
                 self.to_dos = None
@@ -40,7 +43,8 @@ class ToDoList:
         try:
             cursor = self.conn.cursor()
             cursor.execute(
-                "INSERT INTO `to-dos` (user_id, title, status) VALUES (%s, %s, %s)", (self.user_id, title, status)
+                "INSERT INTO `to-dos` (user_id, title, status) VALUES (%s, %s, %s)",
+                (self.user_id, title, status),
             )
             self.conn.commit()
             id = cursor.lastrowid
@@ -52,6 +56,20 @@ class ToDoList:
         except mariadb.Error as e:
             print(e)
             return JsonResponse(500, "Error adding todo")
+        finally:
+            cursor.close()
+
+    def change_status(self, id: int, status: str) -> JsonResponse:
+        try:
+            cursor = self.conn.cursor()
+            cursor.execute(
+                "UPDATE `to-dos` SET status = %s WHERE id = %s ", (status, id)
+            )
+            self.conn.commit()
+            return JsonResponse(200, "Status changed successfully")
+        except mariadb.Error as e:
+            print(e)
+            return JsonResponse(500, "Error updating status")
         finally:
             cursor.close()
 

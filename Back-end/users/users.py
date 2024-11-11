@@ -40,5 +40,6 @@ class UserAuthentication:
         if not self.verify_password(user, password):
             return JsonResponse(401, "Wrong password")
 
+        print(user.email, user.password)
         session["user"] = user.user_id
         return JsonResponse(200, "Login successfull", {"user": user.user_id})

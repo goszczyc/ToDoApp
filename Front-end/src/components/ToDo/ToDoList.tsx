@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, ChangeEvent, useEffect, useState } from "react";
 import apiRequest from "../../misc/apiRequest";
 import NavBar from "../Navigation/NavBar";
 import ToDoItem from "./ToDoItem";
@@ -9,6 +9,7 @@ interface ToDo {
     title: string;
     id: number;
     status: string;
+    previousOption: string | null;
 }
 
 function ToDoList() {
@@ -38,7 +39,7 @@ function ToDoList() {
     /**
      * Succesfull request removes to-do with given id from database
      */
-    async function removeToDo(id: number) {
+    async function handleRemoveToDo(id: number) {
         const data = new FormData();
         data.append("id", id.toString());
         const response = await apiRequest("api/to-dos/delete", {
@@ -54,7 +55,7 @@ function ToDoList() {
     /**
      * Succesfull request adds new to-do in data base and refreshes to-dos list
      */
-    async function addToDoHandle(formEvent: FormEvent) {
+    async function handleAddToDo(formEvent: FormEvent) {
         formEvent.preventDefault();
         const form = formEvent.currentTarget as HTMLFormElement;
         const data = new FormData(form);
@@ -76,6 +77,51 @@ function ToDoList() {
         setIsModalShown((prev) => !prev);
     }
 
+    async function handleStatusChange(
+        event: ChangeEvent,
+        id: number
+    ): Promise<void> {
+        const itemIndex = toDoList.findIndex((todo) => todo.id === id);
+        const previousStatus = toDoList[itemIndex].status;
+        const select = event.currentTarget as HTMLSelectElement;
+
+        
+        setToDoList((prev) =>
+            prev.map((todo) =>
+                todo.id === id
+                    ? {
+                          ...todo,
+                          status: select.value,
+                          previousStatus: previousStatus,
+                      }
+                    : todo
+            )
+        );
+
+        const formData = new FormData();
+        formData.append("status", select.value);
+        formData.append("id", id.toString());
+        const response = await apiRequest("api/to-dos/change_status", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            setToDoList((prev) =>
+                prev.map((todo) =>
+                    todo.id === id
+                        ? {
+                              ...todo,
+                              status: previousStatus,
+                          }
+                        : todo
+                )
+            );
+            alert("Error changing status");
+            return;
+        }
+    }
+
     return (
         <div className="container">
             <NavBar />
@@ -83,7 +129,7 @@ function ToDoList() {
                 <AddToDoButton onClick={handleModalToggle} />
                 {isModalShown && (
                     <ToDoAddForm
-                        addToDoHandle={addToDoHandle}
+                        addToDoHandle={handleAddToDo}
                         closeModal={handleModalToggle}
                     />
                 )}
@@ -93,7 +139,8 @@ function ToDoList() {
                     <ToDoItem
                         key={toDo.id}
                         title={toDo.title}
-                        onRemove={() => removeToDo(toDo.id)}
+                        onRemove={() => handleRemoveToDo(toDo.id)}
+                        onChangeStatus={(e) => handleStatusChange(e, toDo.id)}
                         status={toDo.status}
                     />
                 ))}

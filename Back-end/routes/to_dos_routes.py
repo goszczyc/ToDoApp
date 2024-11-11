@@ -32,3 +32,12 @@ def add_to_do():
     to_do_list = ToDoList(db_connection, session["user"])
     result = to_do_list.add_to_do(todo_title, todo_status)
     return result.get_response()
+
+@to_dos_bp.route("/change_status", methods=["POST"])
+def change_status():
+    db_connection = ConnectToDb()
+    todo_id = request.form.get("id")
+    todo_status = request.form.get("status")
+    to_do_list = ToDoList(db_connection, session["user"])
+    result = to_do_list.change_status(todo_id, todo_status)
+    return result.get_response()

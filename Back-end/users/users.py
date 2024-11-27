@@ -31,7 +31,7 @@ class UserAuthentication:
             cursor.close()
 
     def verify_password(self, user: User, password: str) -> bool:
-        return password == user.password
+        return bcrypt.check_password_hash(user.password, password)
 
     def login_user(self, email: str, password: str) -> JsonResponse:
 

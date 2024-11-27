@@ -5,6 +5,7 @@ from .user import User
 from util.json_response import JsonResponse
 from app import bcrypt
 
+
 class UserAuthentication:
 
     def __init__(self, db_connection: ConnectToDb):
@@ -39,22 +40,19 @@ class UserAuthentication:
             return JsonResponse(404, "User with provided email does not exist :(")
         if not self.verify_password(user, password):
             return JsonResponse(401, "Wrong password")
-
-        print(user.email, user.password)
         session["user"] = user.user_id
         return JsonResponse(200, "Login successfull", {"user": user.user_id})
 
     def signup(self, email: str, password: str, password_repeat: str) -> JsonResponse:
-        print(email, password, password_repeat)
-        if password == '' or password_repeat == '':
+        if password == "" or password_repeat == "":
             return JsonResponse(500, "Passwords cannot be empty")
 
         if password_repeat != password:
             return JsonResponse(500, "Passwords do not match")
-        
+
         if email == "":
             return JsonResponse(500, "Email cannot be empty")
-        
+
         try:
             cursor = self.conn.cursor(dictionary=True)
             cursor.execute("SELECT * FROM `users` WHERE email=%s", (email,))
@@ -62,21 +60,23 @@ class UserAuthentication:
 
             if user_data is not None:
                 return JsonResponse(500, "User with that email already exists")
-            
+
             hashed_password = bcrypt.generate_password_hash(password).decode("utf8")
 
-            cursor.execute("INSERT INTO `users` (`email`, `password`) VALUES (%s, %s)", (email, hashed_password))
+            cursor.execute(
+                "INSERT INTO `users` (`email`, `password`) VALUES (%s, %s)",
+                (email, hashed_password),
+            )
             self.conn.commit()
             if cursor.lastrowid == None:
                 return JsonResponse(500, "Error while signing up")
-            
+
             user_id = cursor.lastrowid
             session["user"] = user_id
             return JsonResponse(200, "Successfully signed up", {"user": user_id})
-            
+
         except mariadb.Error as e:
             print(e)
             return JsonResponse(500, "Error while signing up")
         finally:
             cursor.close()
-

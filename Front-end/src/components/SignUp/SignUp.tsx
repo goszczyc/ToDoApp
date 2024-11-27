@@ -57,7 +57,6 @@ function SignUp() {
 
     // Debounce useEffect
     useEffect(() => {
-        console.log(formValues);
         const timer = setTimeout(() => {
             const newErrors = Object.keys(formValues).reduce((errors, key) => {
                 const field = key as FormField; // Type assertion

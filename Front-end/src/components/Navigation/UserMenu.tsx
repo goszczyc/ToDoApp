@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import apiRequest from "../../misc/apiRequest";
 function UserMenu() {
+    const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const menuButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -21,6 +24,16 @@ function UserMenu() {
         }
     }
 
+    async function handleLogout() {
+        try {
+            const response = await apiRequest("api/users/logout");
+            sessionStorage.removeItem("user");
+            navigate("/login");
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     useEffect(() => {
         document.addEventListener("mousedown", handleClickOutside);
         return () => {
@@ -36,9 +49,12 @@ function UserMenu() {
             {isMenuOpen && (
                 <div
                     ref={menuRef}
-                    className="absolute top-full right-0 bg-dblue p-3 flex flex-col items-center min-w-56"
-                >   
-                    <button className="block px-3 py-1 font-bold text-white text-lg">
+                    className="absolute top-full right-0 bg-dblue p1 flex flex-col items-center min-w-56 z-10"
+                >
+                    <button
+                        className="block px-3 py-2 w-full font-bold text-white text-lg cursor-pointer"
+                        onClick={handleLogout}
+                    >
                         Log out
                     </button>
                 </div>

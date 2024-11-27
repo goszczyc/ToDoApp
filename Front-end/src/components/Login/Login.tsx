@@ -2,8 +2,6 @@ import { FormEvent } from "react";
 import apiRequest from "../../misc/apiRequest";
 import { Link, useNavigate } from "react-router-dom";
 
-// TODO if response ok -> save user id, and secret key to session storage
-
 function Login() {
     const navigate = useNavigate();
     async function handleSubmit(event: FormEvent) {
@@ -17,7 +15,7 @@ function Login() {
         });
 
         if (!result.ok) {
-            alert("CIPA");
+            // TODO nie wiem co tu zrobić chyba wyjebać error jak się nie zaloguje? XD
         }
 
         const data = await result.json();

@@ -27,6 +27,7 @@ function UserMenu() {
     async function handleLogout() {
         try {
             const response = await apiRequest("api/users/logout");
+            if (!response.ok) throw new Error("Logging out failed");
             sessionStorage.removeItem("user");
             navigate("/login");
         } catch (e) {

@@ -16,17 +16,11 @@ def login():
     return result.get_response()
 
 
-@users_bp.route("/check_session")
-def check_session():
-    user_id = session["user"]
-    return {"user": user_id}, 200
-
-
 @users_bp.route("/logout")
 @login_required
 def logout():
     if session["user"]:
-        session["user"] = None
+        session.pop("user")
     return {"user": None}, 200
 
 

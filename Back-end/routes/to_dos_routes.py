@@ -1,11 +1,13 @@
 from flask import Blueprint, request, jsonify, session
 from db_connection.db_connection import ConnectToDb
 from to_do.to_do_list import ToDoList
+from util.login_required import login_required
 
 to_dos_bp = Blueprint("to-dos", __name__)
 
 
 @to_dos_bp.route("/get")
+@login_required
 def get_to_dos():
     db_connection = ConnectToDb()
     to_do_list = ToDoList(db_connection, session["user"])
@@ -14,6 +16,7 @@ def get_to_dos():
 
 
 @to_dos_bp.route("/delete", methods=["POST"])
+@login_required
 def remove_to_do():
     db_connection = ConnectToDb()
     item_id = request.form.get("id")
@@ -25,6 +28,7 @@ def remove_to_do():
 
 
 @to_dos_bp.route("/add", methods=["POST"])
+@login_required
 def add_to_do():
     db_connection = ConnectToDb()
     todo_title = request.form.get("title")
@@ -33,8 +37,11 @@ def add_to_do():
     result = to_do_list.add_to_do(todo_title, todo_status)
     return result.get_response()
 
+
 @to_dos_bp.route("/change_status", methods=["POST"])
+@login_required
 def change_status():
+    print(session)
     db_connection = ConnectToDb()
     todo_id = request.form.get("id")
     todo_status = request.form.get("status")

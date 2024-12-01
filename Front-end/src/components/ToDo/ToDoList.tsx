@@ -2,8 +2,8 @@ import { FormEvent, ChangeEvent, useEffect, useState } from "react";
 import apiRequest from "../../misc/apiRequest";
 import NavBar from "../Navigation/NavBar";
 import ToDoItem from "./ToDoItem";
-import AddToDoButton from "./AddToDoButton";
-import ToDoAddForm from "./ToDoAddForm";
+import AddToDoButton from "./AddToDo/AddToDoButton";
+import ToDoAddForm from "./AddToDo/ToDoAddForm";
 
 interface ToDo {
     title: string;

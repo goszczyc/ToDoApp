@@ -34,7 +34,6 @@ class UserAuthentication:
         return bcrypt.check_password_hash(user.password, password)
 
     def login_user(self, email: str, password: str) -> JsonResponse:
-
         user = self.get_user(email)
         if user == None:
             return JsonResponse(404, "User with provided email does not exist :(")
@@ -44,14 +43,19 @@ class UserAuthentication:
         return JsonResponse(200, "Login successfull", {"user": user.user_id})
 
     def signup(self, email: str, password: str, password_repeat: str) -> JsonResponse:
+        errors = {
+        }
         if password == "" or password_repeat == "":
-            return JsonResponse(500, "Passwords cannot be empty")
+            errors["password"] = "Passwords cannot be empty"
 
         if password_repeat != password:
-            return JsonResponse(500, "Passwords do not match")
+            errors["repeatPassword"] = "Passwords do not match"
 
         if email == "":
-            return JsonResponse(500, "Email cannot be empty")
+            errors["email"] = "Email cannot be empty"
+
+        if len(errors) != 0:
+            return JsonResponse(500, "Invalid data", errors)
 
         try:
             cursor = self.conn.cursor(dictionary=True)
@@ -59,7 +63,7 @@ class UserAuthentication:
             user_data = cursor.fetchone()
 
             if user_data is not None:
-                return JsonResponse(500, "User with that email already exists")
+                return JsonResponse(500, "User with that email already exists", {"email": "User with that email already exists"})
 
             hashed_password = bcrypt.generate_password_hash(password).decode("utf8")
 
@@ -69,7 +73,9 @@ class UserAuthentication:
             )
             self.conn.commit()
             if cursor.lastrowid == None:
-                return JsonResponse(500, "Error while signing up")
+                return JsonResponse(
+                    500, "Unforrtunately the server has failed to sign you up 😭)"
+                )
 
             user_id = cursor.lastrowid
             session["user"] = user_id

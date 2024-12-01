@@ -4,13 +4,24 @@ import { useNavigate } from "react-router-dom";
 import { isAuthenticated } from "../../auth/auth";
 import FormField from "../Util/FormField";
 
+type FormField = "email" | "password" | "repeatPassword";
+class FormError extends Error {
+    private data;
+
+    constructor(message: string, data: object) {
+        super(message);
+        this.data = data;
+    }
+
+    getData() {
+        return this.data;
+    }
+}
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+
 function SignUp() {
     const navigate = useNavigate();
-
-    type FormField = "email" | "password" | "repeatPassword";
-
-    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const PASSWORD_REGEX = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
 
     const [isFormValid, setIsFormValid] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -25,6 +36,7 @@ function SignUp() {
         repeatPassword: "",
     });
 
+    // Update form values
     function handleChange(name: FormField, value: string) {
         setFormValues((prev) => ({ ...prev, [name]: value }));
         setFormErrors((prev) => ({ ...prev, [name]: "" }));
@@ -55,7 +67,7 @@ function SignUp() {
         }
     }
 
-    // Debounce useEffect
+    // Delayed inputs validation
     useEffect(() => {
         const timer = setTimeout(() => {
             const newErrors = Object.keys(formValues).reduce((errors, key) => {
@@ -65,7 +77,7 @@ function SignUp() {
             }, {} as Record<FormField, string>);
             setFormErrors(newErrors);
             setIsSubmitting(false);
-        }, 500); // Adjust debounce time as needed
+        }, 500);
 
         return () => clearTimeout(timer);
     }, [formValues]);
@@ -80,7 +92,7 @@ function SignUp() {
         );
         setIsFormValid(!hasErrors && !hasEmptyFields);
     }, [formErrors, formValues]);
-
+    
     async function handleSubmit(event: FormEvent) {
         event.preventDefault();
         const formData = new FormData();
@@ -97,14 +109,32 @@ function SignUp() {
                 method: "POST",
                 body: formData,
             });
-            
             const data = await result.json();
             
+            if (result.status !== 200) {
+                throw new FormError(data.message, data.data);
+            }
+
             if (data.data.user) {
                 sessionStorage.setItem("user", data.data.user);
                 navigate("/");
             }
         } catch (err) {
+            if (err instanceof FormError) {
+                const errData = err.getData() as Record<FormField, string>;
+
+                // Update errors based on data from response
+                const newErrors = Object.keys(formErrors).reduce(
+                    (errors, key) => {
+                        const field = key as FormField; // Type assertion
+                        const error = errData[field];
+                        return { ...errors, [field]: error ? error : "" };
+                    },
+                    {} as Record<FormField, string>
+                );
+                setFormErrors(newErrors);
+                console.log(newErrors);
+            }
             console.error(err);
         }
     }
@@ -132,7 +162,7 @@ function SignUp() {
                 validCondition={
                     formValues.email !== "" && formErrors.email !== ""
                 }
-                invalidMessage={"Invalid email"}
+                invalidMessage={formErrors.email}
                 onChange={(e) => handleChange("email", e.currentTarget.value)}
             />
             <FormField
@@ -145,9 +175,7 @@ function SignUp() {
                 validCondition={
                     formValues.password !== "" && formErrors.password !== ""
                 }
-                invalidMessage={
-                    "Invalid password (must be at least 8 characters with at least one large Letter, number and special character"
-                }
+                invalidMessage={formErrors.password}
                 onChange={(e) =>
                     handleChange("password", e.currentTarget.value)
                 }
@@ -166,7 +194,7 @@ function SignUp() {
                     formValues.repeatPassword !== "" &&
                     formErrors.repeatPassword !== ""
                 }
-                invalidMessage={"Dupsko"}
+                invalidMessage={formErrors.repeatPassword}
             />
             <button
                 type="submit"

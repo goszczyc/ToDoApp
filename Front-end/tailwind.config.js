@@ -9,6 +9,7 @@ export default {
             colors: {
                 lblue: "#BEE3E2",
                 dblue: "#ADD9D8",
+                mblue: "#06A19D"
             },
         },
         container: {
